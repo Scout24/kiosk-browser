@@ -10,5 +10,5 @@ echo "/usr/sbin/nodm" >/etc/X11/default-display-manager
 sed -i -e 's/NODM_ENABLED=.*/NODM_ENABLED=true/' -e 's/NODM_USER=.*/NODM_USER=kiosk-browser/' /etc/default/nodm
 
 # allow kiosk user to only write in chromium directories
-mkdir -p /var/lib/kiosk-browser/{.cache/chromium,.cache/config,.pki}
-chown -R kiosk-browser:kiosk-browser /var/lib/kiosk-browser/{.cache/chromium,.cache/config,.pki}
+mkdir -p /var/lib/kiosk-browser/{.cache/chromium,.config/chromium,.pki}
+chown -R kiosk-browser:kiosk-browser /var/lib/kiosk-browser/{.cache/chromium,.config/chromium,.pki}
