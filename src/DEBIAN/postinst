@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e 
 
 if ! getent passwd kiosk-browser >/dev/null; then
