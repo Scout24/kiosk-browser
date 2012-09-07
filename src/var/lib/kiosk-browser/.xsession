@@ -4,6 +4,7 @@ set -x
 if test -r /etc/default/kiosk-browser ; then
     source /etc/default/kiosk-browser
 fi
+xset -dpms
 xset s off
 xset s noblank
 while true; do
