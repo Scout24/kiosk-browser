@@ -2,8 +2,9 @@ DPKG=dpkg
 DPKG_OPTS=-b
 
 *.deb:	clean src/*
-	mkdir -p out
-	git archive --format=tar --prefix=src/ HEAD | (tar -C build xf -)
+	rm -Rf build
+	mkdir -p out build
+	git archive --format=tar HEAD src/ | tar -C build --strip-components=1 -x
 	fakeroot ${DPKG} ${DPKG_OPTS} build out
 	rm -Rf build
 
