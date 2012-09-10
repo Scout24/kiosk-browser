@@ -24,6 +24,6 @@ Building
 Installation
 ============
 
-1. Install the .deb package from [out](out/)
+1. Install the .deb package from [out](kiosk-browser/tree/master/out/)
 1. Create `/etc/default/kiosk-browser` and set `KIOSK_BROWSER_START_PAGE`
 1. Reboot the system
