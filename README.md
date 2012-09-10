@@ -14,6 +14,9 @@ The behaviour can be customized in `/etc/default/kiosk-browser`:
 
     on a system which configures the displays properly.
 
+The package is licensed under the GNU Public License, see included
+LICENSE.txt for full license text.
+
 Building
 ========
 
