@@ -1,14 +1,17 @@
 Package: kiosk-browser
-Version: 1.7
+Version: 1.11
 Priority: optional
 Section: universe/web
 Architecture: all
 Essential: no
 Maintainer: $Id: control 27620 2012-05-09 11:38:33Z sschapiro $
-Pre-Depends: nodm, chromium-browser
+Pre-Depends: nodm
+Depends: chromium-browser, x11-xserver-utils, metacity
 Description: Kiosk Browser 
  Setup system to work as a kiosk browser, showing only a full-screen browser.
  .
- Configure the start page in /etc/default/kiosk-browser by setting KIOSK_BROWSER_START_PAGE
+ Configuration options in /etc/default/kiosk-browser 
+   KIOSK_BROWSER_START_PAGE sets the start page
+ Also add your own customization to that file, e.g. xrandr calls.
  .
  Homepage: https://github.com/ImmobilienScout24/kiosk-browser
