@@ -9,8 +9,9 @@ The behaviour can be customized in `/etc/default/kiosk-browser`:
 *   Set `KIOSK_BROWSER_START_PAGE` change start page.
 
 *   Add custom initialization commands. As an example I use
-    > xrandr --output VGA1 --auto --output LVDS1 --off  
-    > sleep 5
+
+        xrandr --output VGA1 --auto --output LVDS1 --off  
+        sleep 5
 
     on a system which configures the displays properly.
 
