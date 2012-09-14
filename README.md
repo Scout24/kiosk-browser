@@ -54,3 +54,53 @@ a `/usr/lib/chromium-browser/master_preferences` file with preferences. For exam
     }
 
 to set the zoom level to 150%. This allows us to have dashboards that look fine both on my desktop and on the kiosk browser.
+
+Show more than one page
+-----------------------
+
+Sometimes a dashboard should cycle between several views. I think that this should be done on the server side, not the client side. For example, create on your web server a file named `urls.js` like this with the URLs in it:
+
+        var urls = [ 
+                "http://www.schapiro.org/schlomo/publications",
+                "http://www.schapiro.org/schlomo/videos"
+                ];
+
+And next to it another file with the HTML code, named `dashboard.html`:
+
+        <!DOCTYPE html>
+        <html>
+        <head>
+        <script type="text/javascript" src="urls.js"></script>
+        <script type="text/javascript">
+        
+        function start() {
+                setInterval(function(){cycle()},60000);
+                cycle();
+        }
+        
+        var counter = 0;
+        function cycle() {
+                var iframe = document.getElementById("iframe");
+                iframe.src=urls[counter++];
+                if (counter >= urls.length) {
+                        counter = 0;
+                }
+        }
+        
+        </script>
+        <style type="text/css">
+        body,iframe {
+                padding: 0px;
+                margin: 0px;
+        }
+        #wrap { position:fixed; left:0; width:100%; top:0; height:100%; }
+        #iframe { display: block; width:100%; height:100%; }
+        </style>
+        <title>Dashboard switcher by Schlomo Schapiro</title>
+        </head>
+        <body onload="start()">
+        <div id="wrap"><iframe id="iframe" src=""/></div>
+        </body>
+        </html>
+
+Finally, adjust `KIOSK_BROWSER_START_PAGE` in `/etc/default/kiosk-browser` to point to this `dashboard.html` and you are done.
