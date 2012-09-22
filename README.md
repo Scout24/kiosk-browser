@@ -1,7 +1,7 @@
 kiosk-browser
 =============
 
-Ubuntu package to set up a system as a kiosk browser.
+Ubuntu package to set up a system as a kiosk browser. Release announcement and example foto] can be found on my blog at http://blog.schlomo.schapiro.org/2012/09/dashboards-made-easy.html.
 
 This package disables the regular GUI and installs a browser-only GUI.
 
