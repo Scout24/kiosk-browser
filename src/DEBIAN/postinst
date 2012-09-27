@@ -2,7 +2,8 @@
 set -e 
 
 if ! getent passwd kiosk-browser >/dev/null; then
-        adduser --disabled-password --gecos "Kiosk Browser User" --firstuid 200 --lastuid 300 --home /var/lib/kiosk-browser kiosk-browser
+    useradd --system --user-group --comment "Kiosk Browser User" --no-create-home --home-dir /var/lib/kiosk-browser kiosk-browser
+    mkdir -p /var/lib/kiosk-browser
 fi
 
 # disable lightdm and enable nodm
@@ -10,6 +11,6 @@ echo "/usr/sbin/nodm" >/etc/X11/default-display-manager
 # disable X cursor
 sed -i -e 's/NODM_X_OPTIONS=.*/NODM_X_OPTIONS="-nocursor -nolisten tcp"/' -e 's/NODM_ENABLED=.*/NODM_ENABLED=true/' -e 's/NODM_USER=.*/NODM_USER=kiosk-browser/' /etc/default/nodm
 
-# allow kiosk user to only write in chromium directories
+# allow kiosk user to only write in directories needed by chromium
 mkdir -p /var/lib/kiosk-browser/{.cache,.config/chromium,.pki}
 chown -R kiosk-browser:kiosk-browser /var/lib/kiosk-browser/{.cache,.config/chromium,.pki}

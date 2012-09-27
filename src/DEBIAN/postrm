@@ -1,8 +1,6 @@
 #!/bin/sh
 set -e
 
-if getent passwd kiosk-browser-g >/dev/null; then
-      	if [ -x /usr/sbin/deluser ]; then
-        	deluser --remove-home kiosk-browser || echo "Could not remove kiosk-browser user."
-	fi
+if getent passwd kiosk-browser >/dev/null; then
+     userdel --force --remove kiosk-browser || echo "Could not remove kiosk-browser user."
 fi
