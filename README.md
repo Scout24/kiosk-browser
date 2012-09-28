@@ -41,6 +41,27 @@ The reason for this hack is that nodm does not kill all sub-processes on shutdow
 Customisation
 =============
 
+XRandR hacks
+------------
+
+With different graphics cards the outputs are named differently. This little script helps me to have the same script for all systems:
+
+    XRANDR_OUTPUT="$(xrandr)"
+    function xrandr_find_port {
+            # find port matching pattern
+            read port junk < <(grep connect <<<"$XRANDR_OUTPUT" | grep -i "$1") ; echo $port
+    }
+
+    function xrandr_find_other_ports {
+            # find ports NOT matching pattern
+            grep connect <<<"$XRANDR_OUTPUT" | cut -f 1 -d " " | grep -v $(xrandr_find_port "$1")
+    }
+
+    MAIN=VGA
+
+    xrandr --output $(xrandr_find_port $MAIN) --rotate left --auto $(for p in $(xrandr_find_other_ports $MAIN) ; do echo --output $p --off ; done )
+
+
 Chromium Preferences
 --------------------
 
