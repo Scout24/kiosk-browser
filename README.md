@@ -37,18 +37,14 @@ If you want to play with the settings without rebooting the system you can use t
     sudo service nodm stop ; sudo pkill -u kiosk-browser ; sleep 5 ; sudo service nodm start
 
 The reason for this hack is that nodm does not kill all sub-processes on shutdown.
+
+Notes
+=====
+
+*   This package disables all inputs in the X server so that nobody can mess with your system or use it as an entry point into your network.
     
 Customisation
 =============
-
-Disable Mouse & Keyboard
-------------------------
-
-If you don't want people messing with your system (or trying to hack your network through it), add this line:
-
-    # disable X inputs :-)
-    for k in $(xinput --list --id-only) ; do xinput --float $k ; done &>/dev/null
-
 
 XRandR hacks
 ------------
