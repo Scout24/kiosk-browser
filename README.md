@@ -41,6 +41,15 @@ The reason for this hack is that nodm does not kill all sub-processes on shutdow
 Customisation
 =============
 
+Disable Mouse & Keyboard
+------------------------
+
+If you don't want people messing with your system (or trying to hack your network through it), add this line:
+
+    # disable X inputs :-)
+    for k in $(xinput --list --id-only) ; do xinput --float $k ; done &>/dev/null
+
+
 XRandR hacks
 ------------
 
