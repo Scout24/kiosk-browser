@@ -1,6 +1,13 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
-if getent passwd kiosk-browser >/dev/null; then
-     userdel --force --remove kiosk-browser || echo "Could not remove kiosk-browser user."
-fi
+case "$1" in
+    purge)
+        if getent passwd kiosk-browser >/dev/null; then
+             userdel --force --remove kiosk-browser || echo "Could not remove kiosk-browser user."
+        fi
+    ;;
+    *)
+        : do nothing
+    ;;
+esac
