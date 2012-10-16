@@ -14,6 +14,8 @@ xset s off
 xset s noblank
 
 while true; do
+  # exit if no display given, use xwininfo to test for running X server
+  xwininfo -root &>/dev/null || exit 0
   # wipe state data
   rm -Rf ~/.config/chromium/* ~/.cache/* ~/.pki/*
   chromium-browser "${KIOSK_BROWSER_OPTIONS[@]}" --no-first-run --start-maximized --kiosk "${KIOSK_BROWSER_START_PAGE:=https://github.com/ImmobilienScout24/kiosk-browser}"
