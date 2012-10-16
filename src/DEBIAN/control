@@ -1,12 +1,12 @@
 Package: kiosk-browser
-Version: 1.15
+Version: 1.16
 Priority: optional
 Section: universe/web
 Architecture: all
 Essential: no
 Maintainer: $Id: control 27620 2012-05-09 11:38:33Z sschapiro $
 Pre-Depends: nodm
-Depends: chromium-browser, x11-xserver-utils, metacity
+Depends: chromium-browser, x11-xserver-utils, metacity, xdotool
 Description: Kiosk Browser 
  Setup system to work as a kiosk browser, showing only a full-screen browser.
  .

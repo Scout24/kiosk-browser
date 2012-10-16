@@ -6,14 +6,10 @@ Ubuntu package to set up a system as a kiosk browser. Release announcement and e
 This package disables the regular GUI and installs a browser-only GUI.
 
 The behaviour can be customized in `/etc/default/kiosk-browser`:
-*   Set `KIOSK_BROWSER_START_PAGE` change start page.
-
-*   Add custom initialization commands. As an example I use
-
-        xrandr --output VGA1 --auto --output LVDS1 --off  
-        sleep 5
-
-    on a system which configures the displays properly.
+*   Set `KIOSK_BROWSER_START_PAGE` to set the start page(s).
+*   Set `KIOSK_BROWSER_PORTS` to autoconfigure these|this display ports (Use xrandr port names)
+*   Set `KIOSK_BROWSER_XRANDR_EXTRA_OPTS` to rotate some displays or have other custom xrandr settings.
+*   Add custom initialization commands or pull the above configuration from somewhere else.
 
 The package is licensed under the GNU Public License, see included
 LICENSE.txt for full license text.
@@ -46,25 +42,27 @@ Notes
 Customisation
 =============
 
-XRandR hacks
+Multi-Monitor Support
 ------------
 
-With different graphics cards the outputs are named differently. This little script helps me to have the same script for all systems:
+kiosk-browser supports setting up multiple monitors with different browser windows. The implementation is somewhat tricky so that I would be happy to get some feedback on it.
 
-    XRANDR_OUTPUT="$(xrandr)"
-    function xrandr_find_port {
-            # find port matching pattern
-            read port junk < <(grep connect <<<"$XRANDR_OUTPUT" | grep -i "$1") ; echo $port
-    }
+The above mentioned `KIOSK_BROWSER_*` variables can be all [Bash Arrays](http://tldp.org/LDP/abs/html/arrays.html) and multi-monitor support is enabled by setting these variables to arrays. In each array the same position refers to the same display, for example:
 
-    function xrandr_find_other_ports {
-            # find ports NOT matching pattern
-            grep connect <<<"$XRANDR_OUTPUT" | cut -f 1 -d " " | grep -v $(xrandr_find_port "$1")
-    }
+    KIOSK_BROWSER_PORTS=(HDMI1 HDMI2)
+    KIOSK_BROWSER_XRANDR_EXTRA_OPTS=("" "--rotate left")
+    KIOSK_BROWSER_START_PAGE=( 
+        http://blog.schlomo.schapiro.org
+        http://go.schapiro.org/schlomo
+    )
 
-    MAIN=VGA
+Note the empty (`""`) array value which means no extra xrandr options for HDMI1. For single monitor operations you can still use these variables to configure the display, e.g.:
 
-    xrandr --output $(xrandr_find_port $MAIN) --rotate left --auto $(for p in $(xrandr_find_other_ports $MAIN) ; do echo --output $p --off ; done )
+    KIOSK_BROWSER_PORTS=VGA
+    KIOSK_BROWSER_XRANDR_EXTRA_OPTS="--rotate left"
+    KIOSK_BROWSER_START_PAGE=http://blog.schlomo.schapiro.org
+
+If you don't know if the VGA port is called VGA or VGA1 you can specify a substring and the scripts will use the first connected port that matches. Here we basically use the fact that a Bash String is exactly the same as a Bash Array with a single value in it.
 
 
 Chromium Preferences
