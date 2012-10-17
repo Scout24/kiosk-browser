@@ -24,7 +24,7 @@ fi
 
 if [[ ! "$KIOSK_BROWSER_PORTS" ]] ; then
 	# set . as a built-in default to use the first connected port that xrandr reports
-	KIOKS_BROWSER_PORTS=.
+	KIOSK_BROWSER_PORTS=.
 fi
 
 if [[ ! "$KIOSK_BROWSER_START_PAGE" ]] ; then
