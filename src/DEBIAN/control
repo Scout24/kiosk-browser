@@ -1,11 +1,11 @@
 Package: kiosk-browser
-Version: 1.18
+Version: 1.20
 Priority: optional
 Section: web
 Architecture: all
 Maintainer: Schlomo Schapiro <kiosk-browser@schlomo.schapiro.org>
 Pre-Depends: nodm
-Depends: chromium-browser, x11-xserver-utils, metacity, xdotool
+Depends: chromium-browser, x11-xserver-utils, metacity, xdotool, x11-apps, sudo, imagemagick
 Homepage: https://github.com/ImmobilienScout24/kiosk-browser
 Description: Kiosk Browser 
  Setup system to work as a kiosk browser, showing only a full-screen browser.
@@ -13,3 +13,5 @@ Description: Kiosk Browser
  Configuration options in /etc/default/kiosk-browser 
    KIOSK_BROWSER_START_PAGE sets the start page
  Also add your own customization to that file, e.g. xrandr calls.
+ .
+ See project homepage for full list of config options.

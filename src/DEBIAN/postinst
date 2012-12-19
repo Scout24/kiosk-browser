@@ -14,3 +14,10 @@ sed -i -e 's/NODM_X_OPTIONS=.*/NODM_X_OPTIONS="-nocursor -nolisten tcp"/' -e 's/
 # allow kiosk user to only write in directories needed by chromium
 mkdir -p /var/lib/kiosk-browser/{.cache,.config/chromium,.pki}
 chown -R kiosk-browser:kiosk-browser /var/lib/kiosk-browser/{.cache,.config/chromium,.pki}
+
+# restart if running, nodm has no status so we simply check for any kiosk-browser processes
+if pgrep -u kiosk-browser >/dev/null ; then
+    service nodm stop
+    sleep 20 # wait for chromium and other subprocesses to exit
+    service nodm start
+fi

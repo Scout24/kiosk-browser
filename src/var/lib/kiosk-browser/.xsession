@@ -32,6 +32,11 @@ if [[ ! "$KIOSK_BROWSER_START_PAGE" ]] ; then
 	KIOSK_BROWSER_START_PAGE=https://github.com/ImmobilienScout24/kiosk-browser
 fi
 
+if [[ ! "$KIOSK_BROWSER_WATCHDOG_TIMEOUT" ]] ; then
+    # default stale screen watchdog is 1h
+    KIOSK_BROWSER_WATCHDOG_TIMEOUT=3600
+fi
+
 # configure displays
 xrandr $(
 	xrandr_position=
@@ -50,6 +55,26 @@ XRANDR_OUTPUT="$(xrandr)"
 xset -dpms
 xset s off
 xset s noblank
+
+# start watchdog, reboot system if screen stops to change
+if (( KIOSK_BROWSER_WATCHDOG_TIMEOUT > 0 )) ; then
+    LASTHASH=""
+    LASTCHANGED="$SECONDS"
+    while sleep "${KIOSK_BROWSER_WATCHDOG_CHECK_INTERVAL:-17}" ; do 
+        HASH=$(import -display :0 -window root -monochrome jpg:- | identify -format '%#' -)
+        #declare -p HASH LASTHASH LASTCHANGED SECONDS
+        if [[ "$HASH" = "$LASTHASH" ]] ; then 
+            if (( SECONDS > LASTCHANGED + KIOSK_BROWSER_WATCHDOG_TIMEOUT )) ; then
+                sudo /sbin/reboot
+                break
+            fi
+        else
+            LASTHASH="$HASH"
+            LASTCHANGED="$SECONDS"
+        fi
+    done </dev/null 1>&2 &
+    trap "kill $!" 0 # kill watchdog on exit
+fi
 
 #forget about running jobs
 disown -a
