@@ -6,6 +6,11 @@ case "$1" in
         if getent passwd kiosk-browser >/dev/null; then
              userdel --force --remove kiosk-browser || echo "Could not remove kiosk-browser user."
         fi
+        if [ -e /usr/share/debconf/confmodule ]; then
+                . /usr/share/debconf/confmodule
+                db_purge
+        fi
+
     ;;
     *)
         : do nothing

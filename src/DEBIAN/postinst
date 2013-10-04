@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e 
 
+# make lintian happy
+. /usr/share/debconf/confmodule
+db_stop
+
+
 if ! getent passwd kiosk-browser >/dev/null; then
     useradd --system --user-group --comment "Kiosk Browser User" --no-create-home --home-dir /var/lib/kiosk-browser kiosk-browser
     mkdir -p /var/lib/kiosk-browser

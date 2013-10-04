@@ -5,7 +5,7 @@ Section: web
 Architecture: all
 Maintainer: Schlomo Schapiro <kiosk-browser@schlomo.schapiro.org>
 Pre-Depends: nodm
-Depends: chromium-browser, x11-xserver-utils, metacity, xdotool, x11-apps, sudo, imagemagick
+Depends: chromium-browser, x11-xserver-utils, metacity, xdotool, x11-apps, sudo, imagemagick, debconf
 Homepage: https://github.com/ImmobilienScout24/kiosk-browser
 Description: Kiosk Browser 
  Setup system to work as a kiosk browser, showing only a full-screen browser.
