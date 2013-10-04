@@ -24,12 +24,12 @@ chown -R kiosk-browser:kiosk-browser /var/lib/kiosk-browser/{.cache,.config/chro
 
 # if lightdm is running stop if first
 if status lightdm ; then
-    stop lightdm
+    stop lightdm || :
     sleep 5 # give it a moment to stop everything
 fi
 
 if pgrep -u kiosk-browser >/dev/null ; then
-    service nodm stop
+    service nodm stop || :
     echo "Waiting for kiosk-browser processes to exit..."
     sleep 20 # wait for chromium and other subprocesses to exit
 fi
