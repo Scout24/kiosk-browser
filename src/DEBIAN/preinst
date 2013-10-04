@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -e
+
+# http://manpages.ubuntu.com/manpages/precise/man7/debconf.7.html
+export DEBCONF_NONINTERACTIVE_SEEN=true DEBIAN_FRONTEND=noninteractive
+
+debconf-set-selections <<EOF
+lightdm shared/default-x-display-manager        select  nodm
+EOF
+
