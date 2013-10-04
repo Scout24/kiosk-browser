@@ -1,0 +1,9 @@
+#!/bin/sh
+set -e
+
+# source debconf library
+. /usr/share/debconf/confmodule
+
+db_set shared/default-x-display-manager nodm
+db_fset shared/default-x-display-manager seen true
+

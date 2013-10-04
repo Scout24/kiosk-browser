@@ -16,9 +16,18 @@ sed -i -e 's/NODM_X_OPTIONS=.*/NODM_X_OPTIONS="-nocursor -nolisten tcp"/' -e 's/
 mkdir -p /var/lib/kiosk-browser/{.cache,.config/chromium,.pki}
 chown -R kiosk-browser:kiosk-browser /var/lib/kiosk-browser/{.cache,.config/chromium,.pki}
 
-# restart if running, nodm has no status so we simply check for any kiosk-browser processes
+
+# if lightdm is running stop if first
+if status lightdm ; then
+    stop lightdm
+    sleep 5 # give it a moment to stop everything
+fi
+
 if pgrep -u kiosk-browser >/dev/null ; then
     service nodm stop
+    echo "Waiting for kiosk-browser processes to exit..."
     sleep 20 # wait for chromium and other subprocesses to exit
-    service nodm start
 fi
+
+# always start nodm
+service nodm start
