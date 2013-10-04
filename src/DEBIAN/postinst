@@ -6,8 +6,11 @@ if ! getent passwd kiosk-browser >/dev/null; then
     mkdir -p /var/lib/kiosk-browser
 fi
 
-# disable lightdm and enable nodm
+# disable lightdm and enable nodm AND MAKE IT STICK :-)
+chattr -i /etc/X11/default-display-manager || :
 echo "/usr/sbin/nodm" >/etc/X11/default-display-manager
+chattr +i /etc/X11/default-display-manager || :
+
 # disable X cursor
 sed -i -e 's/NODM_X_OPTIONS=.*/NODM_X_OPTIONS="-nocursor -nolisten tcp"/' -e 's/NODM_ENABLED=.*/NODM_ENABLED=true/' -e 's/NODM_USER=.*/NODM_USER=kiosk-browser/' /etc/default/nodm
 
