@@ -10,6 +10,7 @@ case "$1" in
                 . /usr/share/debconf/confmodule
                 db_purge
         fi
+        rm -f /usr/sbin/kiosk-browser
 
     ;;
     *)
