@@ -87,7 +87,7 @@ while true; do
 	# if KIOSK_BROWSER_PORTS is set, assume that it specifies multiple screens connected.
 	for (( c=0 ; c<${#KIOSK_BROWSER_PORTS[@]} ; c++ )) ; do
 		chromium-browser --user-data-dir=$HOME/.config/chromium/$c "${KIOSK_BROWSER_OPTIONS[@]}" --disable-translate --no-first-run --start-maximized --kiosk "${KIOSK_BROWSER_START_PAGE[c]:-$KIOSK_BROWSER_START_PAGE}" &
-		sleep 1
+		sleep 5
 		# move new window to the current screen. We identify the window by the --user-data-dir option which appears in the window class name :-)
 		port=$(xrandr_find_port "${KIOSK_BROWSER_PORTS[c]}")
 		port_x=$(sed -ne "/$port/s#[^+].*+\([0-9]\+\)+.*#\1#p" <<<"$XRANDR_OUTPUT")
@@ -95,5 +95,5 @@ while true; do
 	done
 
 	wait # for the browsers to finish
-	sleep 5
+	sleep 15
 done
