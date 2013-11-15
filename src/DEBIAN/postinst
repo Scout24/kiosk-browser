@@ -24,8 +24,8 @@ mkdir -p /var/lib/kiosk-browser/{.cache,.config/chromium,.pki}
 chown -R kiosk-browser:kiosk-browser /var/lib/kiosk-browser/{.cache,.config/chromium,.pki}
 
 
-# if lightdm is running stop if first
-if status lightdm ; then
+# if lightdm is running stop if first (only on Ubuntu)
+if test -r /etc/init/lightdm.conf && status lightdm ; then
     stop lightdm || :
     sleep 5 # give it a moment to stop everything
 fi
