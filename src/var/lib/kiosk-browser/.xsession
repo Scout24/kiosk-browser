@@ -79,6 +79,12 @@ fi
 #forget about running jobs
 disown -a
 
+# Ubuntu has chromium-browser and Debian wheezy has chromium
+CHROME=$(type -p chromium-browser 2>/dev/null)
+if [[ -z "$CHROME" ]] ; then
+    CHROME=$(type -p chromium 2>/dev/null)
+fi
+
 while true; do
 	# exit if no display given, use xwininfo to test for running X server
 	xwininfo -root &>/dev/null || exit 0
@@ -86,7 +92,7 @@ while true; do
 	rm -Rf ~/.config/chromium/* ~/.cache/* ~/.pki/*
 	# if KIOSK_BROWSER_PORTS is set, assume that it specifies multiple screens connected.
 	for (( c=0 ; c<${#KIOSK_BROWSER_PORTS[@]} ; c++ )) ; do
-		chromium-browser --user-data-dir=$HOME/.config/chromium/$c "${KIOSK_BROWSER_OPTIONS[@]}" --disable-translate --no-first-run --start-maximized --kiosk "${KIOSK_BROWSER_START_PAGE[c]:-$KIOSK_BROWSER_START_PAGE}" &
+		$CHROME --user-data-dir=$HOME/.config/chromium/$c "${KIOSK_BROWSER_OPTIONS[@]}" --disable-translate --no-first-run --start-maximized --kiosk "${KIOSK_BROWSER_START_PAGE[c]:-$KIOSK_BROWSER_START_PAGE}" &
 		sleep 5
 		# move new window to the current screen. We identify the window by the --user-data-dir option which appears in the window class name :-)
 		port=$(xrandr_find_port "${KIOSK_BROWSER_PORTS[c]}")
