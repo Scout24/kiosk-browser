@@ -37,6 +37,11 @@ if [[ ! "$KIOSK_BROWSER_WATCHDOG_TIMEOUT" ]] ; then
     KIOSK_BROWSER_WATCHDOG_TIMEOUT=3600
 fi
 
+if [[ ! "$KIOSK_BROWSER_VNC_VIEWER_DISPLAY" ]] ; then
+    # disable VNC viewer by default
+    KIOSK_BROWSER_VNC_VIEWER_DISPLAY=-1
+fi
+
 # configure displays
 xrandr $(
 	xrandr_position=
@@ -56,11 +61,18 @@ xset -dpms
 xset s off
 xset s noblank
 
+KILL_ON_EXIT=()
+function exittrap {
+    kill ${KILL_ON_EXIT[@]}
+}
+
+trap exittrap 0 # kill subprocesses on exit
+
 # start watchdog, reboot system if screen stops to change
 if (( KIOSK_BROWSER_WATCHDOG_TIMEOUT > 0 )) ; then
     LASTHASH=""
     LASTCHANGED="$SECONDS"
-    while sleep "${KIOSK_BROWSER_WATCHDOG_CHECK_INTERVAL:-17}" ; do 
+    while sleep "${KIOSK_BROWSER_WATCHDOG_CHECK_INTERVAL:-313}" ; do 
         HASH=$(import -display :0 -window root -monochrome jpg:- | identify -format '%#' -)
         #declare -p HASH LASTHASH LASTCHANGED SECONDS
         if [[ "$HASH" = "$LASTHASH" ]] ; then 
@@ -73,10 +85,16 @@ if (( KIOSK_BROWSER_WATCHDOG_TIMEOUT > 0 )) ; then
             LASTCHANGED="$SECONDS"
         fi
     done </dev/null 1>&2 &
-    trap "kill $!" 0 # kill watchdog on exit
+    KILL_ON_EXIT=( ${KILL_ON_EXIT[@]} $! ) # kill watchdog on exit
 fi
 
-#forget about running jobs
+# start vnc viewer if requested
+if [[ "$KIOSK_BROWSER_VNC_VIEWER_DISPLAY" ]] && (( KIOSK_BROWSER_VNC_VIEWER_DISPLAY >= 0 )) ; then
+    vncviewer -fullscreen -viewonly -listen "$KIOSK_BROWSER_VNC_VIEWER_DISPLAY" &
+    KILL_ON_EXIT=( ${KILL_ON_EXIT[@]} $! ) # kill vncviewer on exit
+fi
+
+#forget about running jobs, the relevant ones are in KILL_ON_EXIT
 disown -a
 
 # Ubuntu has chromium-browser and Debian wheezy has chromium
