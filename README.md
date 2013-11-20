@@ -18,7 +18,7 @@ LICENSE.txt for full license text.
 Building
 ========
 
-1. Install `fakeroot` and `dpkg`.
+1. Install `fakeroot`, `lintian` and `dpkg`.
 1. Checkout this github repo and type `make`.
 1. In `out` you should find the resulting .deb package file.
 
