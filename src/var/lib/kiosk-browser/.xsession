@@ -6,14 +6,16 @@ metacity &
 
 # show debug info for 60 seconds as overlay
 {
-    echo "Welcome to the Kiosk Browser"
+    echo "Welcome to the Kiosk Browser (http://github.com/ImmobilienScout24/kiosk-browser)"
     echo
     echo "This is $(uname -n)"
     ip a
     ip route
     cat /etc/resolv.conf
     perl -e '$/ = undef; $d=<>; $d =~ m/.*(lease {.*?})$/s ; print $1' $(ps ax | grep dhclient | sed -ne "s/.* \(\/[^ ]\+\.lease[s]\?\).*/\1/p") <<<""
-} | osd_cat --pos bottom --align left --colour black --font 10x20 --outline=2 --outlinecolour=white --lines 50 --delay 60
+    echo
+    echo "This message will self-destruct in 60 seconds"
+} | osd_cat --pos bottom --align left --colour green --font 10x20 --lines 50 --delay 60
 
 # cache xrandr configuration
 XRANDR_OUTPUT="$(xrandr)"
@@ -50,7 +52,7 @@ fi
 
 if [[ ! "$KIOSK_BROWSER_VNC_VIEWER_DISPLAY" ]] ; then
     # disable VNC viewer by default
-    KIOSK_BROWSER_VNC_VIEWER_DISPLAY=-1
+    KIOSK_BROWSER_VNC_VIEWER_DISPLAY=0
 fi
 
 # configure displays
@@ -84,7 +86,7 @@ if (( KIOSK_BROWSER_WATCHDOG_TIMEOUT > 0 )) ; then
     LASTHASH=""
     LASTCHANGED="$SECONDS"
     while sleep "${KIOSK_BROWSER_WATCHDOG_CHECK_INTERVAL:-313}" ; do 
-        HASH=$(import -display :0 -window root -monochrome jpg:- | identify -format '%#' -)
+        HASH=$(nice import -display :0 -window root -monochrome jpg:- | nice identify -format '%#' -)
         #declare -p HASH LASTHASH LASTCHANGED SECONDS
         if [[ "$HASH" = "$LASTHASH" ]] ; then 
             if (( SECONDS > LASTCHANGED + KIOSK_BROWSER_WATCHDOG_TIMEOUT )) ; then
