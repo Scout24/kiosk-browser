@@ -1,11 +1,11 @@
 Package: kiosk-browser
-Version: 31
+Version: 32
 Priority: optional
 Section: web
 Architecture: all
 Maintainer: Schlomo Schapiro <kiosk-browser@schlomo.schapiro.org>
 Pre-Depends: nodm
-Depends: chromium | chromium-browser, x11-xserver-utils, metacity, xdotool, x11-apps, sudo, imagemagick, debconf, xtightvncviewer
+Depends: chromium | chromium-browser, x11-xserver-utils, metacity, xdotool, x11-apps, sudo, imagemagick, debconf, xtightvncviewer, xosd-bin
 Homepage: https://github.com/ImmobilienScout24/kiosk-browser
 Description: Kiosk Browser 
  Setup system to work as a kiosk browser, showing only a full-screen browser.

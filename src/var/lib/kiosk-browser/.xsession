@@ -4,6 +4,17 @@ exec 2> >(logger -t kiosk-browser)
 # windows manager helps with fullscreen
 metacity &
 
+# show debug info for 60 seconds as overlay
+{
+    echo "Welcome to the Kiosk Browser"
+    echo
+    echo "This is $(uname -n)"
+    ip a
+    ip route
+    cat /etc/resolv.conf
+    perl -e '$/ = undef; $d=<>; $d =~ m/.*(lease {.*?})$/s ; print $1' $(ps ax | grep dhclient | sed -ne "s/.* \(\/[^ ]\+\.lease[s]\?\).*/\1/p") <<<""
+} | osd_cat --pos bottom --align left --colour black --font 10x20 --outline=2 --outlinecolour=white --lines 50 --delay 60
+
 # cache xrandr configuration
 XRANDR_OUTPUT="$(xrandr)"
 function xrandr_find_port {
