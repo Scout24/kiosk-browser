@@ -1,0 +1,57 @@
+#!/bin/bash
+
+function usage {
+    echo "Usage: $0 <start|stop|status|evening|morning>"
+    exit 1
+}
+
+[[ -z "$1" || "$*" == *-h* ]] && usage
+
+
+if [[ "$USER" != root && $(id -u) != "0" ]] ; then
+    # restart as root
+    exec sudo -i "$(readlink -f "$0")" "$@"
+    echo "Need sudo permissions!"
+    exit 1
+fi
+
+function is_pi {
+    type -p tvservice &>/dev/null
+}
+
+function start {
+    service nodm start
+}
+
+function stop {
+    service nodm stop
+    echo -n "Waiting for kiosk-browser processes to terminate "
+    while status ; do echo -n . ; sleep 10 ; done
+    echo " OK"
+}
+
+function status {
+    if pstree -paul kiosk-browser 2>/dev/null ; then
+        return 0
+    else
+        echo "kiosk-browser not running"
+        return 1
+    fi
+}
+
+function evening {
+    stop
+    is_pi && tvservice -o || vbetool dpms off
+}
+
+function morning {
+    is_pi && tvservice -p || vbetool dpms on
+    sleep 2
+    start
+}
+
+
+case "$1" in
+    (start|stop|status|evening|morning) "$1" ;;
+    (*) usage ;;
+esac
