@@ -18,7 +18,7 @@ info: out/*.deb
 	dpkg-deb -c out/*.deb
 
 repo: out/*.deb
-	/data/mnt/is24-ubuntu-repo/putinrepo.sh out/*.deb
+	../putinrepo.sh out/*.deb
 
 clean:
 	rm -fr out build
