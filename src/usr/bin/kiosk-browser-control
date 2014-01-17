@@ -52,6 +52,7 @@ function morning {
 
 
 case "$1" in
-    (start|stop|status|evening|morning) "$1" ;;
+    (start|stop|status) "$1" ;;
+    (evening|morning) [[ -e /etc/kiosk-browser-disable-morning-evening ]] || "$1" ;;
     (*) usage ;;
 esac
