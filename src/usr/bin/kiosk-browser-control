@@ -45,7 +45,9 @@ function evening {
 }
 
 function morning {
-    is_pi && tvservice -p || vbetool dpms on
+    # this apparently does not work reliably, so we reboot if on RPi
+    # is_pi && tvservice -p || vbetool dpms on
+    is_pi && reboot || vbetool dpms on
     sleep 2
     start
 }
