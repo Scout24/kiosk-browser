@@ -123,12 +123,12 @@ while true; do
 	rm -Rf ~/.config/chromium/* ~/.cache/* ~/.pki/*
 	# if KIOSK_BROWSER_PORTS is set, assume that it specifies multiple screens connected.
 	for (( c=0 ; c<${#KIOSK_BROWSER_PORTS[@]} ; c++ )) ; do
-		$CHROME --user-data-dir=$HOME/.config/chromium/$c "${KIOSK_BROWSER_OPTIONS[@]}" --disable-translate --no-first-run --start-maximized --kiosk "${KIOSK_BROWSER_START_PAGE[c]:-$KIOSK_BROWSER_START_PAGE}" &
+		$CHROME --user-data-dir=$HOME/.config/chromium/$c "${KIOSK_BROWSER_OPTIONS[@]}" --disable-translate --no-first-run "${KIOSK_BROWSER_START_PAGE[c]:-$KIOSK_BROWSER_START_PAGE}" &
 		sleep 5
 		# move new window to the current screen. We identify the window by the --user-data-dir option which appears in the window class name :-)
 		port=$(xrandr_find_port "${KIOSK_BROWSER_PORTS[c]}")
 		port_x=$(sed -ne "/$port/s#[^+].*+\([0-9]\+\)+.*#\1#p" <<<"$XRANDR_OUTPUT")
-		xdotool search --classname chromium/$c windowmove --sync $port_x 0
+		xdotool search --classname chromium/$c windowmove --sync $port_x 0 key F11
 	done
 
 	wait # for the browsers to finish
