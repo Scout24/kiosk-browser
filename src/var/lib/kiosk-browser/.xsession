@@ -101,6 +101,11 @@ if (( KIOSK_BROWSER_WATCHDOG_TIMEOUT > 0 )) ; then
     KILL_ON_EXIT=( ${KILL_ON_EXIT[@]} $! ) # kill watchdog on exit
 fi
 
+if [[ "$KIOSK_BROWSER_SHOW_SYSTEM_MONITOR" ]] ; then
+    xosview &
+    KILL_ON_EXIT=( ${KILL_ON_EXIT[@]} $! ) # kill system viewer on exit
+fi
+
 # start vnc viewer if requested
 if [[ "$KIOSK_BROWSER_VNC_VIEWER_DISPLAY" ]] && (( KIOSK_BROWSER_VNC_VIEWER_DISPLAY >= 0 )) ; then
     vncviewer -fullscreen -viewonly -listen "$KIOSK_BROWSER_VNC_VIEWER_DISPLAY" &

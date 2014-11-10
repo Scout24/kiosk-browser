@@ -1,0 +1,28 @@
+xosview*geometry: 300x200-0-0
+xosview*loadPriority: 5
+xosview*loadGraph: True
+
+xosview*cpuPriority: 5
+xosview*cpuGraph: True
+
+xosview*memPriority: 20
+
+xosview*swap: False
+xosview*page: False
+xosview*gfx: False
+
+xosview*netPriority: 10
+xosview*netGraph: True
+
+xosview*NFSStats: False
+xosview*NFSDStats: False
+xosview*interrupts: False
+
+xosview*wireless: True
+xosview*wirelessPriority: 20
+
+xosview*disk: True
+xosview*diskPriority: 10
+xosview*diskGraph: True
+
+
