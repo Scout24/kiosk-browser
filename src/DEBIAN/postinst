@@ -17,7 +17,12 @@ echo "/usr/sbin/nodm" >/etc/X11/default-display-manager
 ln -sf nodm /usr/sbin/kiosk-browser
 
 # disable X cursor
-sed -i -e 's/NODM_X_OPTIONS=.*/NODM_X_OPTIONS="-nocursor -nolisten tcp"/' -e 's/NODM_ENABLED=.*/NODM_ENABLED=true/' -e 's/NODM_USER=.*/NODM_USER=kiosk-browser/' /etc/default/nodm
+sed -i \
+    -e 's/NODM_X_OPTIONS=.*/NODM_X_OPTIONS="-nocursor -nolisten tcp"/' \
+    -e 's/NODM_ENABLED=.*/NODM_ENABLED=true/' \
+    -e 's/NODM_USER=.*/NODM_USER=kiosk-browser/' \
+    -e 's#NODM_XSESSION=.*#NODM_XSESSION=/usr/bin/kiosk-browser-xsession#' \
+    /etc/default/nodm
 
 # allow kiosk user to only write in directories needed by chromium
 mkdir -p /var/lib/kiosk-browser/{.cache,.config/chromium,.pki}
@@ -33,7 +38,7 @@ fi
 if pgrep -u kiosk-browser >/dev/null ; then
     service nodm stop || :
     echo "Waiting for kiosk-browser processes to exit..."
-    sleep 20 # wait for chromium and other subprocesses to exit
+    sleep 5 # wait for chromium and other subprocesses to exit
 fi
 
 # always start nodm
