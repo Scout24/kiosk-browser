@@ -2,8 +2,11 @@
 exec 2> >(logger -t kiosk-browser)
 
 KILL_ON_EXIT=
+HOME=$(mktemp -d)
 function exittrap {
     kill $KILL_ON_EXIT $(jobs -p)
+    sleep 2
+    rm -Rf $HOME
 }
 
 trap exittrap 0 # kill subprocesses on exit
@@ -87,7 +90,7 @@ xset s noblank
 # start watchdog, reboot system if screen stops to change
 if (( KIOSK_BROWSER_WATCHDOG_TIMEOUT > 0 )) ; then
     (
-        trap 'exittrap' TERM
+        trap 'kill $(jobs -p)' TERM
 
         LASTHASH=""
         LASTCHANGED="$SECONDS"
@@ -127,23 +130,54 @@ KILL_ON_EXIT=$(jobs -p)
 # the wait below should wait only for the browsers and not hang on the system jobs
 disown -a
 
+
 while true; do
     # exit if no display given, use xwininfo to test for running X server
     xwininfo -root &>/dev/null || exit 0
     # wipe state data
-    rm -Rf ~/.config/chromium/* ~/.cache/* ~/.pki/*
+    rm -Rf ~/.config/chromium/* ~/.cache/* ~/.pki/* ~/profile*
     # if KIOSK_BROWSER_PORTS is set, assume that it specifies multiple screens connected.
     for (( c=0 ; c<${#KIOSK_BROWSER_PORTS[@]} ; c++ )) ; do
-        $CHROME --user-data-dir=$HOME/.config/chromium/$c "${KIOSK_BROWSER_OPTIONS[@]}" --disable-translate --no-first-run "${KIOSK_BROWSER_START_PAGE[c]:-$KIOSK_BROWSER_START_PAGE}" &
-        sleep 30
-        # move new window to the current screen. We identify the window by the --user-data-dir option which appears in the window class name :-)
         port=$(xrandr_find_port "${KIOSK_BROWSER_PORTS[c]}")
         port_x=$(sed -ne "/$port/s#[^+].*+\([0-9]\+\)+.*#\1#p" <<<"$XRANDR_OUTPUT")
-        xdotool search --classname chromium/$c windowmove --sync $port_x 0 key F11
+
+        BROWSER_PROFILE_DIR=~/profile-$c
+        URL="${KIOSK_BROWSER_START_PAGE[c]:-$KIOSK_BROWSER_START_PAGE}"
+
+        mkdir -p $BROWSER_PROFILE_DIR
+        if [[ "$KIOSK_BROWSER_PROGRAM" == "epiphany" ]] && type -p epiphany-browser &>/dev/null ; then
+            epiphany-browser --class epiphany-$c --profile $BROWSER_PROFILE_DIR "$URL" &
+            PID=$!
+            sleep 10 &
+            wait $!
+            # Use PID to distinguish browsers
+            xdotool search --class epiphany-$c windowmove --sync $port_x 0 key F11
+        elif [[ "$KIOSK_BROWSER_PROGRAM" == "uzbl" ]] && type -p uzbl &>/dev/null ; then
+            uzbl -n uzbl-$c "$URL" &
+            sleep 5 &
+            wait $!
+            xdotool search --class uzbl-$c windowmove --sync $port_x 0
+        else
+            $CHROME --user-data-dir=$BROWSER_PROFILE_DIR "${KIOSK_BROWSER_OPTIONS[@]}" --disable-translate --no-first-run "$URL" &
+
+            # move new window to the current screen. We identify the window by the --user-data-dir option which appears in the window class name :-)
+
+            starttime=$SECONDS
+            while ! xdotool search --classname $BROWSER_PROFILE_DIR windowmove --sync $port_x 0 key F11 ; do
+                if (( SECONDS-starttime > 30 )) ; then
+                    break
+                fi
+                sleep 2 &
+                wait $!
+            done
+            sleep 3 &
+            wait $!
+        fi
     done
 
     wait # for the browsers to finish
-    sleep 15
+    sleep 15 &
+    wait $!
 done
 
 # vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
