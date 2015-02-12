@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+openbox configuration for kiosk-browser
+-->
+
+<openbox_config xmlns="http://openbox.org/3.4/rc"
+		xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<applications>
+  <application name="*xosview*">
+    <decor>no</decor>
+    <desktop>all</desktop>
+    <layer>above</layer>
+    <skip_pager>yes</skip_pager>
+    <skip_taskbar>yes</skip_taskbar>
+  </application>
+</applications>
+
+</openbox_config>

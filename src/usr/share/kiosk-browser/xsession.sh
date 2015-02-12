@@ -1,5 +1,5 @@
 #!/bin/bash
-exec 2> >(logger -t kiosk-browser)
+exec &> >(logger -t kiosk-browser)
 
 KILL_ON_EXIT=
 HOME=$(mktemp -d)
@@ -12,8 +12,8 @@ function exittrap {
 trap exittrap 0 # kill subprocesses on exit
 
 
-# windows manager helps with fullscreen
-matchbox-window-manager -use_titlebar no -force_dialogs xosview -use_dialog_mode free &
+# window manager helps with fullscreen, window manager must support XINERAMA for multi-screen setups
+openbox --debug --config-file /usr/share/kiosk-browser/openbox-rc.xml &
 
 # show debug info for 60 seconds as overlay
 {
@@ -26,9 +26,8 @@ matchbox-window-manager -use_titlebar no -force_dialogs xosview -use_dialog_mode
     perl -e '$/ = undef; $d=<>; $d =~ m/.*(lease {.*?})$/s ; print $1' $(ps ax | grep dhclient | sed -ne "s/.* \(\/[^ ]\+\.lease[s]\?\).*/\1/p") <<<""
     echo
     echo "This message will self-destruct in 60 seconds"
-} | osd_cat --pos bottom --align left --colour green --font 10x20 --lines 50 --delay 60 &
-
-wait $!
+} | osd_cat --pos bottom --align left --colour green --outline 2 --font 10x20 --lines 50 --delay 60 &
+#wait $!
 
 # cache xrandr configuration
 XRANDR_OUTPUT="$(xrandr)"
@@ -77,7 +76,8 @@ xrandr $(
         xrandr_position="--right-of $port"
     done
     )
-sleep 3
+sleep 10 &
+wait $!
 
 # xrandr configuration changed, update cache
 XRANDR_OUTPUT="$(xrandr)"
@@ -158,12 +158,12 @@ while true; do
             wait $!
             xdotool search --class uzbl-$c windowmove --sync $port_x 0
         else
-            $CHROME --user-data-dir=$BROWSER_PROFILE_DIR "${KIOSK_BROWSER_OPTIONS[@]}" --disable-translate --no-first-run "$URL" &
+            $CHROME --user-data-dir=$BROWSER_PROFILE_DIR "${KIOSK_BROWSER_OPTIONS[@]}" --disable-translate --no-first-run --start-fullscreen "$URL" &
 
             # move new window to the current screen. We identify the window by the --user-data-dir option which appears in the window class name :-)
 
             starttime=$SECONDS
-            while ! xdotool search --classname $BROWSER_PROFILE_DIR windowmove --sync $port_x 0 key F11 ; do
+            while ! xdotool search --classname $BROWSER_PROFILE_DIR windowmove --sync $port_x 0 ; do
                 if (( SECONDS-starttime > 30 )) ; then
                     break
                 fi
@@ -174,6 +174,8 @@ while true; do
             wait $!
         fi
     done
+
+    xdotool search xosview windowactivate # make sure xosview is visible
 
     wait # for the browsers to finish
     sleep 15 &
