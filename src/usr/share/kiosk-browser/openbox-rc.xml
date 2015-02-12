@@ -15,6 +15,11 @@ openbox configuration for kiosk-browser
     <skip_pager>yes</skip_pager>
     <skip_taskbar>yes</skip_taskbar>
   </application>
+
+  <application class="Chromium">
+    <decor>no</decor>
+    <maximized>true</maximized>
+  </application>
 </applications>
 
 </openbox_config>

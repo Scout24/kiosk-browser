@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function usage {
-    echo "Usage: $0 <start|stop|status|restart|evening|morning>"
+    echo "Usage: $0 <start|stop|status|restart|evening|morning|interactive>"
     exit 1
 }
 
@@ -34,7 +34,7 @@ function status {
     if pstree -paul kiosk-browser 2>/dev/null ; then
         return 0
     else
-        echo "kiosk-browser not running"
+        echo "kiosk-browser not running" 1>&2
         return 1
     fi
 }
@@ -44,6 +44,21 @@ function restart {
     sleep 10
     start
 }
+
+function interactive {
+    status >/dev/null || return 1
+
+    homedir=( /tmp/kiosk-browser.HOME* )
+    if [[ "$homedir" != "${homedir[*]}" ]] ; then
+        echo "ERROR: Found more than one kiosk-browser Home Directory: ${homedir[*]}" 1>&2
+        echo "       Please clean up the stale directories and try again" 1>&2
+        return 1
+    fi
+    
+    echo "Launching interactive Shell in current kiosk-browser session."
+    sudo -u kiosk-browser -i env HOME=$homedir DISPLAY=:0 bash -i
+}
+
 function evening {
     stop
     is_pi && tvservice -o || vbetool dpms off
@@ -59,7 +74,7 @@ function morning {
 
 
 case "$1" in
-    (start|stop|status|restart) "$1" ;;
+    (start|stop|status|restart|interactive) "$1" ;;
     (evening|morning) [[ -e /tmp/kiosk-browser-disable-morning-evening ]] || "$1" ;;
     (*) usage ;;
 esac

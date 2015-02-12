@@ -2,9 +2,9 @@
 exec &> >(logger -t kiosk-browser)
 
 KILL_ON_EXIT=
-HOME=$(mktemp -d)
+HOME=$( mktemp -d -t kiosk-browser.HOME.XXXXXXXXXXXXX )
 function exittrap {
-    kill $KILL_ON_EXIT $(jobs -p)
+    kill -9 $KILL_ON_EXIT $(jobs -p)
     sleep 2
     rm -Rf $HOME
 }
@@ -90,7 +90,7 @@ xset s noblank
 # start watchdog, reboot system if screen stops to change
 if (( KIOSK_BROWSER_WATCHDOG_TIMEOUT > 0 )) ; then
     (
-        trap 'kill $(jobs -p)' TERM
+        trap 'kill $(jobs -p) ; sleep 1 ; kill $(jobs -p) &>/dev/null' TERM
 
         LASTHASH=""
         LASTCHANGED="$SECONDS"
@@ -158,7 +158,7 @@ while true; do
             wait $!
             xdotool search --class uzbl-$c windowmove --sync $port_x 0
         else
-            $CHROME --user-data-dir=$BROWSER_PROFILE_DIR "${KIOSK_BROWSER_OPTIONS[@]}" --disable-translate --no-first-run --start-fullscreen "$URL" &
+            $CHROME --user-data-dir=$BROWSER_PROFILE_DIR "${KIOSK_BROWSER_OPTIONS[@]}" --disable-translate --no-first-run --start-fullscreen --app="$URL" &
 
             # move new window to the current screen. We identify the window by the --user-data-dir option which appears in the window class name :-)
 
