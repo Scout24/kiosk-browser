@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function usage {
-    echo "Usage: $0 <start|stop|status|evening|morning>"
+    echo "Usage: $0 <start|stop|status|restart|evening|morning>"
     exit 1
 }
 
@@ -39,6 +39,11 @@ function status {
     fi
 }
 
+function restart {
+    stop
+    sleep 10
+    start
+}
 function evening {
     stop
     is_pi && tvservice -o || vbetool dpms off
@@ -54,7 +59,7 @@ function morning {
 
 
 case "$1" in
-    (start|stop|status) "$1" ;;
+    (start|stop|status|restart) "$1" ;;
     (evening|morning) [[ -e /tmp/kiosk-browser-disable-morning-evening ]] || "$1" ;;
     (*) usage ;;
 esac

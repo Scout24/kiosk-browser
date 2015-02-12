@@ -64,7 +64,7 @@ fi
 
 if [[ ! "$KIOSK_BROWSER_VNC_VIEWER_DISPLAY" ]] ; then
     # disable VNC viewer by default
-    KIOSK_BROWSER_VNC_VIEWER_DISPLAY=0
+    KIOSK_BROWSER_VNC_VIEWER_DISPLAY=-1
 fi
 
 # configure displays
