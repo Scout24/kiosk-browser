@@ -8,8 +8,11 @@ openbox configuration for kiosk-browser
 		xmlns:xi="http://www.w3.org/2001/XInclude">
 
 <applications>
-  <application name="*xosview*">
+  <application name="*">
     <decor>no</decor>
+  </application>  
+
+  <application name="*xosview*">
     <desktop>all</desktop>
     <layer>above</layer>
     <skip_pager>yes</skip_pager>
@@ -17,9 +20,12 @@ openbox configuration for kiosk-browser
   </application>
 
   <application class="Chromium">
-    <decor>no</decor>
     <maximized>true</maximized>
   </application>
+
+  <application name="uzbl*">
+    <fullscreen>yes</fullscreen>  
+  </application>  
 </applications>
 
 </openbox_config>

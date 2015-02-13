@@ -154,3 +154,8 @@ And next to it another file with the HTML code, named `dashboard.html`:
         </html>
 
 Finally, adjust `KIOSK_BROWSER_START_PAGE` in `/etc/default/kiosk-browser` to point to this `dashboard.html` and you are done.
+
+Hacking
+=======
+
+The kiosk-browser user session creates a temporary Home Directory under `/tmp`. To access the running kiosk-browser session use `kiosk-browser-control interactive`. In the shell you can use `cd` to go to the session Home Directory.
