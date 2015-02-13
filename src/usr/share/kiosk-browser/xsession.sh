@@ -1,5 +1,6 @@
 #!/bin/bash
 exec &> >(logger -t "kiosk-browser[$$]" )
+set -x
 
 KILL_ON_EXIT=
 HOME=$( mktemp -d /tmp/kiosk-browser.HOME.XXXXXXXXXXXXX )
@@ -17,6 +18,12 @@ function exittrap {
 }
 trap exittrap EXIT # kill subprocesses on exit
 
+# Wait 30 seconds for network by checking for default route
+(( end_time=SECONDS+30 ))
+until (( SECONDS > end_time)) || [[ "$(ip route)" == *default* ]] ; do
+    sleep 2 &
+    wait $!
+done
 
 # show debug info for 60 seconds as overlay
 {
@@ -49,7 +56,6 @@ function xrandr_find_other_ports {
     grep connect <<<"$XRANDR_OUTPUT" | cut -f 1 -d " " | grep -v $(xrandr_find_port "$1")
 }
 
-set -x
 if test -r /etc/default/kiosk-browser ; then
     source /etc/default/kiosk-browser
 fi
