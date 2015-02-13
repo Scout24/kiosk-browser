@@ -16,7 +16,7 @@ function exittrap {
         rm -Rf $HOME
     ) </dev/null &
 }
-trap exittrap EXIT # kill subprocesses on exit
+trap exittrap TERM EXIT # kill subprocesses on exit
 
 # Wait 30 seconds for network by checking for default route
 (( end_time=SECONDS+30 ))
@@ -154,6 +154,9 @@ UZBL_CONFIG="set show_status=0
 set geometry=maximized"
 
 while true; do
+    # exit if no display given, use xwininfo to test for running X server
+    xwininfo -root &>/dev/null || exit 0
+
     # if KIOSK_BROWSER_PORTS is set, assume that it specifies multiple screens connected.
     for (( c=0 ; c<${#KIOSK_BROWSER_PORTS[@]} ; c++ )) ; do
         port=$(xrandr_find_port "${KIOSK_BROWSER_PORTS[c]}")
@@ -177,11 +180,12 @@ while true; do
             xdotool search --class uzbl-$c windowmove --sync $port_x 0
         else
             $CHROME --user-data-dir=$BROWSER_PROFILE_DIR "${KIOSK_BROWSER_OPTIONS[@]}" --disable-translate --no-first-run --start-fullscreen --app="$URL" &
+            PID=$!
 
             # move new window to the current screen. We identify the window by the --user-data-dir option which appears in the window class name :-)
 
             starttime=$SECONDS
-            while ! xdotool search --classname $BROWSER_PROFILE_DIR windowmove --sync $port_x 0 ; do
+            while ! xdotool search --onlyvisible --pid $PID --name any windowmove --sync $port_x 0 ; do
                 if (( SECONDS-starttime > 30 )) ; then
                     break
                 fi

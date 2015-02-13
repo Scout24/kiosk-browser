@@ -6,6 +6,9 @@ openbox configuration for kiosk-browser
 
 <openbox_config xmlns="http://openbox.org/3.4/rc"
 		xmlns:xi="http://www.w3.org/2001/XInclude">
+<desktops>
+  <number>1</number>
+</desktops>
 
 <applications>
   <application name="*">
@@ -19,7 +22,7 @@ openbox configuration for kiosk-browser
     <skip_taskbar>yes</skip_taskbar>
   </application>
 
-  <application class="Chromium">
+  <application class="*omium*">
     <maximized>true</maximized>
   </application>
 
