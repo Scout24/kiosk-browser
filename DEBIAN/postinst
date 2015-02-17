@@ -24,7 +24,7 @@ cat >/etc/default/nodm <<EOF
 # Note: Must be sh compatible!
 
 if type plymouth >/dev/null 2>&1 ; then
-    plymouth quit # disable plymouth on Ubuntu, it prevents restarting the kiosk-browser
+    plymouth quit || : # disable plymouth on Ubuntu, it prevents restarting the kiosk-browser
 fi
 
 NODM_ENABLED=true
