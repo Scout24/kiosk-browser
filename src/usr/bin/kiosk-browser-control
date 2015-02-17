@@ -26,7 +26,7 @@ function start {
 function stop {
     service nodm stop
     echo -n "Waiting for kiosk-browser processes to terminate "
-    while status ; do echo -n . ; sleep 10 ; done
+    while status ; do echo -n . ; sleep 3 ; done
     echo " OK"
 }
 
@@ -41,7 +41,7 @@ function status {
 
 function restart {
     stop
-    sleep 10
+    sleep 1
     start
 }
 
