@@ -18,13 +18,23 @@ echo "/usr/sbin/nodm" >/etc/X11/default-display-manager
 # lightdm needs this for the debconf stuff because it uses kiosk-browser as a display manager
 ln -sf nodm /usr/sbin/kiosk-browser
 
-# disable X cursor
-sed -i \
-    -e 's/NODM_X_OPTIONS=.*/NODM_X_OPTIONS="-nocursor -nolisten tcp"/' \
-    -e 's/NODM_ENABLED=.*/NODM_ENABLED=true/' \
-    -e 's/NODM_USER=.*/NODM_USER=kiosk-browser/' \
-    -e 's#NODM_XSESSION=.*#NODM_XSESSION=/usr/share/kiosk-browser/xsession.sh#' \
-    /etc/default/nodm
+cat >/etc/default/nodm <<EOF
+# nodm configuration for kiosk-browser package
+#
+# Note: Must be sh compatible!
+
+if type plymouth >/dev/null 2>&1 ; then
+    plymouth quit # disable plymouth on Ubuntu, it prevents restarting the kiosk-browser
+fi
+
+NODM_ENABLED=true
+NODM_USER=kiosk-browser
+NODM_FIRST_VT='7'
+NODM_XSESSION="exec /usr/share/kiosk-browser/xsession.sh"
+NODM_X_OPTIONS="-nocursor -nolisten tcp"
+NODM_MIN_SESSION_TIME=60
+
+EOF
 
 # if lightdm is running stop if first (only on Ubuntu)
 if test -r /etc/init/lightdm.conf && status lightdm ; then
@@ -34,6 +44,7 @@ fi
 
 if pgrep -u kiosk-browser >/dev/null ; then
     service nodm stop || :
+    pkill -TERM -u kiosk-browser
     echo "Waiting for kiosk-browser processes to exit..."
     sleep 5 # wait for chromium and other subprocesses to exit
 fi
