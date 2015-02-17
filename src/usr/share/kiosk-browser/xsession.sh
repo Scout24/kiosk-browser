@@ -1,5 +1,5 @@
 #!/bin/bash
-exec &> >(logger -t "kiosk-browser[$$]" )
+exec &> >(exec logger -t "kiosk-browser[$$]" )
 set -x
 
 KILL_ON_EXIT=
@@ -107,7 +107,8 @@ xset s noblank
 # start watchdog, reboot system if screen stops to change
 if (( KIOSK_BROWSER_WATCHDOG_TIMEOUT > 0 )) ; then
     (
-	exec &> >(logger -t "kiosk-browser[$$]-watchdog" )
+	WATCHDOG_PID=$BASHPID
+	exec &> >(exec logger -t "kiosk-browser[$$]-watchdog[$WATCHDOG_PID]" )
 	: "Starting watchdog. Timeout is $KIOSK_BROWSER_WATCHDOG_TIMEOUT seconds, checking every $KIOSK_BROWSER_WATCHDOG_CHECK_INTERVAL seconds"
         trap 'kill -TERM $(jobs -p)' TERM
 
@@ -153,7 +154,7 @@ fi
 UZBL_CONFIG="set show_status=0
 set geometry=maximized"
 
-while true; do
+while sleep 5 & wait $!; do
     # exit if no display given, use xwininfo to test for running X server
     xwininfo -root &>/dev/null || exit 99
 
@@ -197,16 +198,12 @@ while true; do
                 sleep 2 &
                 wait $!
             done
-            sleep 3 &
-            wait $!
         fi
     done
 
     xdotool search xosview windowactivate # make sure xosview is visible
 
     wait # for the browsers to finish
-    sleep 15 &
-    wait $!
 done
 
 # vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
