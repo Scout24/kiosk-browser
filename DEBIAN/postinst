@@ -44,7 +44,7 @@ fi
 
 if pgrep -u kiosk-browser >/dev/null ; then
     service nodm stop || :
-    pkill -TERM -u kiosk-browser
+    pkill -TERM -u kiosk-browser || :
     echo "Waiting for kiosk-browser processes to exit..."
     sleep 5 # wait for chromium and other subprocesses to exit
 fi
