@@ -16,7 +16,7 @@ function exittrap {
         rm -Rf $HOME
     ) </dev/null &
 }
-trap exittrap TERM EXIT # kill subprocesses on exit
+trap exittrap HUP TERM EXIT # kill subprocesses on exit
 
 # Wait 30 seconds for network by checking for default route
 (( end_time=SECONDS+30 ))
@@ -87,7 +87,7 @@ xrandr $(
     xrandr_position=
     for (( c=0 ; c<${#KIOSK_BROWSER_PORTS[@]} ; c++ )) ; do
         port=$(xrandr_find_port "${KIOSK_BROWSER_PORTS[c]}")
-        echo "--output $port ${KIOSK_BROWSER_XRANDR_EXTRA_OPTS[c]} $xrandr_position --auto"
+        echo "--output $port ${KIOSK_BROWSER_XRANDR_EXTRA_OPTS[c]} $( ((c == 0)) && echo --primary ) $xrandr_position --auto"
         xrandr_position="--right-of $port"
     done
     )
@@ -155,7 +155,7 @@ set geometry=maximized"
 
 while true; do
     # exit if no display given, use xwininfo to test for running X server
-    xwininfo -root &>/dev/null || exit 0
+    xwininfo -root &>/dev/null || exit 99
 
     # if KIOSK_BROWSER_PORTS is set, assume that it specifies multiple screens connected.
     for (( c=0 ; c<${#KIOSK_BROWSER_PORTS[@]} ; c++ )) ; do
@@ -187,7 +187,12 @@ while true; do
             starttime=$SECONDS
             while ! xdotool search --onlyvisible --pid $PID --name any windowmove --sync $port_x 0 ; do
                 if (( SECONDS-starttime > 30 )) ; then
-                    break
+                    killall -TERM ${CHROME##*/} # if we can't find a chrome window then we kill them all and try again, killall needs only basename
+                    sleep 2 &
+                    wait $!
+                    killall -KILL ${CHROME##*/}
+                    kill -KILL $(jobs -p) # kill all background jobs (= browsers) to restart outer while loop
+                    break 2 # abort the for loop
                 fi
                 sleep 2 &
                 wait $!

@@ -6,7 +6,9 @@ set -e
 db_stop
 
 
-if ! getent passwd kiosk-browser >/dev/null; then
+if getent passwd kiosk-browser >/dev/null; then
+    usermod --groups video,audio kiosk-browser
+else
     useradd --system --user-group --groups video,audio --comment "Kiosk Browser User" --no-create-home --home-dir /var/lib/kiosk-browser kiosk-browser
     mkdir -p /var/lib/kiosk-browser
 fi
