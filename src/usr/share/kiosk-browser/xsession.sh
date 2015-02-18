@@ -1,5 +1,9 @@
 #!/bin/bash
 exec &> >(exec logger -t "kiosk-browser[$$]" )
+
+# sanitize environment
+export LANG=en_US LANGUAGE=en_US LC_ALL=en_US.UTF-8
+unset ${!XDG_*}
 set -x
 
 KILL_ON_EXIT=
@@ -9,14 +13,20 @@ function exittrap {
     kill -TERM ${procs[@]}
     (
         # wait in background for all procs to be gone before removing the old home directory
-        # reason is that nodm KILLs the session a short time after TERMinating it
+        # reason is that nodm KILLs the session 2 seconds after TERMinating it
         sleep 5 &
         wait $!
         kill -KILL $KILL_ON_EXIT ${procs[@]} &>/dev/null
         rm -Rf $HOME
+        pstree -paul $USER
+        pkill -KILL -e -u $USER # harakiri
     ) </dev/null &
 }
-trap exittrap HUP TERM EXIT # kill subprocesses on exit
+trap exittrap TERM EXIT # kill subprocesses on exit
+
+# dump what we got so far
+declare -p
+pstree -paul $USER
 
 # Wait 30 seconds for network by checking for default route
 (( end_time=SECONDS+30 ))
@@ -48,12 +58,7 @@ openbox --debug --config-file /usr/share/kiosk-browser/openbox-rc.xml &
 XRANDR_OUTPUT="$(xrandr)"
 function xrandr_find_port {
     # find connected port matching pattern
-    read port junk < <(grep connect <<<"$XRANDR_OUTPUT" | grep -i "$1") ; echo $port
-}
-
-function xrandr_find_other_ports {
-    # find ports NOT matching pattern
-    grep connect <<<"$XRANDR_OUTPUT" | cut -f 1 -d " " | grep -v $(xrandr_find_port "$1")
+    sed -n -e "/$1.* connect/s/^\([^ ]\+\).*/\1/p" <<<"$XRANDR_OUTPUT"
 }
 
 if test -r /etc/default/kiosk-browser ; then
@@ -87,10 +92,15 @@ xrandr $(
     xrandr_position=
     for (( c=0 ; c<${#KIOSK_BROWSER_PORTS[@]} ; c++ )) ; do
         port=$(xrandr_find_port "${KIOSK_BROWSER_PORTS[c]}")
-        echo "--output $port ${KIOSK_BROWSER_XRANDR_EXTRA_OPTS[c]} $( ((c == 0)) && echo --primary ) $xrandr_position --auto"
-        xrandr_position="--right-of $port"
+        if [[ "$port" ]] ; then
+            #                                                                        / we use xrandr_position as indicator of first port
+            echo "--output $port ${KIOSK_BROWSER_XRANDR_EXTRA_OPTS[c]} $( [[ -z "$xrandr_position" ]] && echo --primary ) $xrandr_position --auto"
+            xrandr_position="--right-of $port"
+        else
+            : skipping configuration of "${KIOSK_BROWSER_PORTS[c]}" because it is not connected
+        fi
     done
-    )
+)
 
 # wait a moment for displays to settle
 sleep 5 &
@@ -161,12 +171,16 @@ while sleep 5 & wait $!; do
     # if KIOSK_BROWSER_PORTS is set, assume that it specifies multiple screens connected.
     for (( c=0 ; c<${#KIOSK_BROWSER_PORTS[@]} ; c++ )) ; do
         port=$(xrandr_find_port "${KIOSK_BROWSER_PORTS[c]}")
+        [[ -z "$port" ]] && continue # skip for all invalid ports (that are not a number)
         port_x=$(sed -ne "/$port/s#[^+].*+\([0-9]\+\)+.*#\1#p" <<<"$XRANDR_OUTPUT")
 
         BROWSER_PROFILE_DIR=~/profile-$c
         URL="${KIOSK_BROWSER_START_PAGE[c]:-$KIOSK_BROWSER_START_PAGE}"
 
+        # start with empty profile dir
+        [[ -d $BROWSER_PROFILE_DIR ]] && rm -Rf $BROWSER_PROFILE_DIR
         mkdir -p $BROWSER_PROFILE_DIR
+
         if [[ "$KIOSK_BROWSER_PROGRAM" == "epiphany" ]] && type -p epiphany-browser &>/dev/null ; then
             epiphany-browser --class epiphany-$c --profile $BROWSER_PROFILE_DIR "$URL" &
             PID=$!
@@ -180,7 +194,7 @@ while sleep 5 & wait $!; do
             wait $!
             xdotool search --class uzbl-$c windowmove --sync $port_x 0
         else
-            $CHROME --user-data-dir=$BROWSER_PROFILE_DIR "${KIOSK_BROWSER_OPTIONS[@]}" --disable-translate --no-first-run --start-fullscreen --app="$URL" &
+            $CHROME --user-data-dir=$BROWSER_PROFILE_DIR "${KIOSK_BROWSER_OPTIONS[@]}" --use-fake-ui-for-media-stream --disable-translate --no-first-run --start-fullscreen --app="$URL" &
             PID=$!
 
             # move new window to the current screen. We identify the window by the --user-data-dir option which appears in the window class name :-)
