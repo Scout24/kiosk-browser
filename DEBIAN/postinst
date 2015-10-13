@@ -36,18 +36,19 @@ NODM_MIN_SESSION_TIME=60
 
 EOF
 
-# if lightdm is running stop if first (only on Ubuntu)
+# if lightdm is running stop it first (only on Ubuntu)
+# Maybe we should first ask the user?
 if test -r /etc/init/lightdm.conf && status lightdm ; then
-    stop lightdm || :
+    invoke-rc.d lightdm stop || :
     sleep 5 # give it a moment to stop everything
 fi
 
 if pgrep -u kiosk-browser >/dev/null ; then
-    service nodm stop || :
+    invoke-rc.d nodm stop || :
     pkill -TERM -u kiosk-browser || :
     echo "Waiting for kiosk-browser processes to exit..."
     sleep 5 # wait for chromium and other subprocesses to exit
 fi
 
 # always start nodm
-service nodm start
+invoke-rc.d nodm start
