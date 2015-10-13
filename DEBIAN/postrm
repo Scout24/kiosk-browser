@@ -3,6 +3,7 @@ set -e
 
 case "$1" in
     purge)
+	invoke-rc.d nodm stop
         if getent passwd kiosk-browser >/dev/null; then
              userdel --force --remove kiosk-browser || echo "Could not remove kiosk-browser user."
         fi
@@ -19,6 +20,8 @@ case "$1" in
 	done
 	INSTALLED_WM=`which $I`
 	echo $INSTALLED_WM > /etc/X11/default-display-manager
+	update-rc.d nodm remove
+	invoke-rc.d $I restart
 
     ;;
     *)

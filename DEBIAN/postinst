@@ -38,7 +38,7 @@ EOF
 
 # if lightdm is running stop it first (only on Ubuntu)
 # Maybe we should first ask the user?
-if test -r /etc/init/lightdm.conf && status lightdm ; then
+if test -r /etc/init/lightdm.conf && invoke-rc.d lightdm status ; then
     invoke-rc.d lightdm stop || :
     sleep 5 # give it a moment to stop everything
 fi
