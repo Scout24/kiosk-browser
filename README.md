@@ -1,3 +1,7 @@
+# This project is DEPRECATED and not any longer supported
+
+you might want to use https://github.com/schlomo/kiosk-browser instead.
+
 kiosk-browser
 =============
 
