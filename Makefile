@@ -12,7 +12,7 @@
 	/usr/sbin/visudo -c -f build/etc/sudoers.d/kiosk-browser
 	fakeroot dpkg -b build out
 	rm -Rf build
-	lintian -i out/*.deb
+	lintian --suppress-tags postrm-contains-additional-updaterc.d-calls -i out/*.deb
 
 info: out/*.deb
 	dpkg-deb -I out/*.deb

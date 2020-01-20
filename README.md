@@ -15,7 +15,8 @@ The behavior can be customized in `/etc/default/kiosk-browser`:
 *   Set `KIOSK_BROWSER_START_PAGE` to set the start page(s).
 *   Set `KIOSK_BROWSER_PORTS` to autoconfigure these|this display ports (Use xrandr port names)
 *   Set `KIOSK_BROWSER_XRANDR_EXTRA_OPTS` to rotate some displays or set other custom xrandr settings.
-*   Set `KIOSK_BROWSER_WATCHDOG_TIMEOUT` to the amount of seconds after which the systems reboots if the screen did not change. Default is 3600. Set KIOSK_BROWSER_WATCHDOG_CHECK_INTERVAL to the check interval in seconds, default is 313.
+*   Set `KIOSK_BROWSER_WATCHDOG_TIMEOUT` to the amount of seconds after which the systems reboots if the screen did not change. Default is 3600. 
+*   Set `KIOSK_BROWSER_WATCHDOG_CHECK_INTERVAL` to the check interval in seconds, default is 313.
 *   Set `KIOSK_BROWSER_SHOW_SYSTEM_MONITOR=yes` to show [xosview](http://xosview.sourceforge.net/).
 *   Set `KIOSK_BROWSER_VNC_VIEWER_DISPLAY=0` to enable a vncviewer in listening mode on port 5500.
 *   Add custom initialization commands or pull the above configuration from somewhere else.

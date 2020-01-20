@@ -20,11 +20,11 @@ function is_pi {
 }
 
 function start {
-    service nodm start
+    invoke-rc.d nodm start 
 }
 
 function stop {
-    service nodm stop
+    invoke-rc.d nodm stop
     echo -n "Waiting for kiosk-browser processes to terminate "
     while status ; do echo -n . ; sleep 3 ; done
     echo " OK"

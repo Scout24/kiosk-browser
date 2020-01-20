@@ -3,6 +3,7 @@ set -e
 
 case "$1" in
     purge)
+	invoke-rc.d nodm stop
         if getent passwd kiosk-browser >/dev/null; then
              userdel --force --remove kiosk-browser || echo "Could not remove kiosk-browser user."
         fi
@@ -11,6 +12,16 @@ case "$1" in
                 db_purge
         fi
         rm -f /usr/sbin/kiosk-browser
+	# In a perfect world, this should also care for lightdm xdm wdm slim lxdm gdm etc...
+	WMS=`dpkg-query -W -f='Package: ${Package}\nProvides: ${Provides}\n'   | grep -B 1 -E "^Provides: .*x-display-manager" | grep Package | cut -d" " -f2`
+	for I in $WMS
+	do
+		dpkg -l $I | tail -1 | grep ^ii > /dev/null && break
+	done
+	INSTALLED_WM=`which $I`
+	echo $INSTALLED_WM > /etc/X11/default-display-manager
+	update-rc.d nodm remove
+	invoke-rc.d $I restart
 
     ;;
     *)
